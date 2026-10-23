@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduSmart - Platform Belajar Interaktif</title>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-graduation-cap text-3xl text-amber-300"></i>
+                <span class="font-bold text-xl tracking-wide">EduSmart</span>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="flex items-center space-x-2 bg-indigo-700 px-3 py-1.5 rounded-full text-sm">
+                    <i class="fa-solid fa-fire text-amber-400"></i>
+                    <span class="font-medium" id="user-points">0 XP</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-indigo-900 font-bold">
+                        S
+                    </div>
+                    <span class="hidden md:inline font-medium text-sm">Siswa Edukasi</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+        
+        <!-- Left & Center Panel: Player & Interactive Workspace -->
+        <section class="lg:col-span-2 space-y-6">
+            
+            <!-- Video Player Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="relative bg-black aspect-video flex items-center justify-center">
+                    <video id="learning-video" controls class="w-full h-full object-cover">
+                        <source id="video-source" src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+                        Browser Anda tidak mendukung pemutar video HTML5.
+                    </video>
+                </div>
+                
+                <!-- Video Controls & Watch Tracker Header -->
+                <div class="p-4 sm:p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                        <h1 id="lesson-title" class="text-xl font-bold text-slate-900">1. Pengantar Berpikir Kritis & Logika</h1>
+                        <span id="lesson-status-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 w-fit">
+                            <i class="fa-solid fa-clock mr-1"></i> Sedang Dipelajari
+                        </span>
+                    </div>
+
+                    <!-- Progress Bar Monitoring -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs text-slate-500 font-medium">
+                            <span>Progres menonton video ini:</span>
+                            <span id="video-progress-text">0%</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2">
+                            <div id="video-progress-bar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Tabs (Ringkasan Materi & Latihan Soal) -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="border-b border-slate-200 flex bg-slate-50">
+                    <button id="tab-btn-summary" onclick="switchTab('summary')" class="flex-1 py-3 px-4 font-semibold text-sm text-indigo-600 border-b-2 border-indigo-600 flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Ringkasan Materi</span>
+                    </button>
+                    <button id="tab-btn-quiz" onclick="switchTab('quiz')" class="flex-1 py-3 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 border-b-2 border-transparent flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Latihan Soal</span>
+                    </button>
+                </div>
+
+                <div class="p-5 sm:p-6">
+                    <!-- Tab Ringkasan -->
+                    <div id="tab-summary" class="space-y-4">
+                        <h3 class="text-lg font-semibold text-slate-900">Poin Penting Pembelajaran</h3>
+                        <div id="summary-content" class="text-slate-600 space-y-2 text-sm sm:text-base leading-relaxed">
+                            <!-- Diisi dinamis oleh JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Tab Latihan Soal (Quiz) -->
+                    <div id="tab-quiz" class="hidden space-y-6">
+                        <div id="quiz-container">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-xs font-bold text-indigo-600 uppercase tracking-wider">Soal <span id="quiz-current-num">1</span> dari <span id="quiz-total-num">2</span></span>
+                                <span id="quiz-score-display" class="text-xs font-semibold bg-emerald-100 text-emerald-800 px-2 py-1 rounded">Skor Terakhir: -</span>
+                            </div>
+                            
+                            <h4 id="quiz-question" class="text-base font-semibold text-slate-800 mb-4">Pertanyaan akan muncul di sini...</h4>
+
+                            <div id="quiz-options" class="space-y-2.5">
+                                <!-- Pilihan jawaban di-render JS -->
+                            </div>
+
+                            <div id="quiz-feedback" class="hidden mt-4 p-3.5 rounded-xl text-sm font-medium"></div>
+
+                            <div class="mt-6 flex justify-end space-x-3">
+                                <button id="quiz-submit-btn" onclick="checkQuizAnswer()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-xl text-sm transition">
+                                    Cek Jawaban
+                                </button>
+                                <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="hidden bg-slate-800 hover:bg-slate-900 text-white font-medium px-5 py-2 rounded-xl text-sm transition">
+                                    Soal Berikutnya <i class="fa-solid fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Panel: Course Curriculum & Sidebar Navigation -->
+        <aside class="space-y-6">
+            
+            <!-- Overall Progress Widget -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-900 mb-3 flex items-center justify-between">
+                    <span>Progres Kurikulum</span>
+                    <i class="fa-solid fa-chart-line text-indigo-600"></i>
+                </h3>
+                <div class="w-full bg-slate-100 rounded-full h-3 mb-2">
+                    <div id="total-course-progress" class="bg-emerald-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+                <p class="text-xs text-slate-500 flex justify-between">
+                    <span>Materi Selesai:</span>
+                    <span id="completed-count-text" class="font-semibold text-slate-700">0 / 3</span>
+                </p>
+            </div>
+
+            <!-- Playlist / List Materi -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-900">Daftar Modul Belajar</h3>
+                    <span class="text-xs text-slate-500">3 Video</span>
+                </div>
+                <div id="module-list" class="divide-y divide-slate-100 max-h-[450px] overflow-y-auto custom-scrollbar">
+                    <!-- List modul dirender otomatis oleh JS -->
+                </div>
+            </div>
+
+            <!-- Fitur Tambahan: Catatan Mandiri -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="font-bold text-slate-900 mb-2 flex items-center space-x-2">
+                    <i class="fa-solid fa-note-sticky text-amber-500"></i>
+                    <span>Catatan Pribadi Siswa</span>
+                </h3>
+                <p class="text-xs text-slate-500 mb-3">Tulis poin khusus yang ingin kamu ingat dari video ini.</p>
+                <textarea id="personal-notes" placeholder="Ketik catatanmu di sini..." class="w-full text-sm p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none h-24 resize-none mb-2"></textarea>
+                <button onclick="saveNotes()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs py-2 rounded-xl transition">
+                    Simpan Catatan
+                </button>
+            </div>
+
+        </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <p>&copy; 2026 EduSmart Platform. Dibuat untuk Hosting di GitHub Pages.</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // Data Struktur Modul & Soal Latihan
+        const courseData = [
+            {
+                id: 0,
+                title: "1. Pengantar Berpikir Kritis & Logika",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                summary: `
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><b>Berpikir Kritis:</b> Kemampuan menganalisis informasi secara obyektif dan membuat penilaian yang beralasan.</li>
+                        <li><b>Komponen Utama:</b> Observasi, Analisis, Inferensi, Evaluasi, dan Komunikasi.</li>
+                        <li><b>Manfaat:</b> Membantu membedakan fakta vs opini serta mencegah terpengaruh hoaks.</li>
+                    </ul>
+                `,
+                quizzes: [
+                    {
+                        question: "Apa tujuan utama dari menerapkan pola berpikir kritis?",
+                        options: [
+                            "Memenangi setiap argumen dalam diskusi",
+                            "Menganalisis informasi secara objektif untuk keputusan yang rasional",
+                            "Mengingat semua informasi tanpa ragu",
+                            "Menolak semua gagasan dari orang lain"
+                        ],
+                        correct: 1,
+                        explanation: "Berpikir kritis bertujuan untuk mengevaluasi data dan argumen secara rasional dan objektif."
+                    },
+                    {
+                        question: "Langkah pertama dalam proses analisis masalah adalah...",
+                        options: [
+                            "Mengambil kesimpulan langsung",
+                            "Mengabaikan data sekunder",
+                            "Melakukan observasi dan pengumpulan fakta",
+                            "Menyalahkan pihak lain"
+                        ],
+                        correct: 2,
+                        explanation: "Observasi awal dan mengumpulkan data faktual adalah fondasi awal sebelum menganalisis."
+                    }
+                ]
+            },
+            {
+                id: 1,
+                title: "2. Metode Penelitian & Pengumpulan Data",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                summary: `
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><b>Metode Kuantitatif:</b> Menggunakan data berupa angka dan analisis statistik.</li>
+                        <li><b>Metode Kualitatif:</b> Berfokus pada pemahaman mendalam, wawancara, dan analisis naratif.</li>
+                        <li><b>Instrumen Penelitian:</b> Angket, kuesioner, wawancara terstruktur, dan studi pustaka.</li>
+                    </ul>
+                `,
+                quizzes: [
+                    {
+                        question: "Metode penelitian yang mengolah data berupa angka dan grafik disebut...",
+                        options: [
+                            "Metode Kualitatif",
+                            "Metode Kuantitatif",
+                            "Metode Naratif",
+                            "Metode Historis"
+                        ],
+                        correct: 1,
+                        explanation: "Kuantitatif berhubungan erat dengan pengukuran kuantitas angka dan statistik."
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "3. Evaluasi Hasil Belajar & Implementasi",
+                videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                summary: `
+                    <ul class="list-disc pl-5 space-y-2">
+                        <li><b>Evaluasi Diri:</b> Memantau pemahaman secara berkala melalui latihan soal.</li>
+                        <li><b>Refleksi:</b> Mengidentifikasi topik yang masih perlu diperdalam.</li>
+                    </ul>
+                `,
+                quizzes: [
+                    {
+                        question: "Mengapa tes/latihan soal berkala penting dalam pembelajaran mandiri?",
+                        options: [
+                            "Hanya untuk formalitas",
+                            "Untuk mengukur retensi daya ingat dan pemahaman konsep",
+                            "Agar video pembelajaran selesai lebih cepat",
+                            "Tidak ada kegunaannya"
+                        ],
+                        correct: 1,
+                        explanation: "Kuis berkala menguji daya ingat serta pemahaman aplikasi konsep."
+                    }
+                ]
+            }
+        ];
+
+        // Global State (Disimpan di localStorage)
+        let currentLessonIndex = 0;
+        let userProgress = JSON.parse(localStorage.getItem('edu_progress')) || {
+            completedModules: [],
+            points: 100,
+            quizScores: {}
+        };
+        let currentQuizIndex = 0;
+        let selectedOption = null;
+
+        // Element Selectors
+        const videoElement = document.getElementById('learning-video');
+        const videoSource = document.getElementById('video-source');
+        const progressBar = document.getElementById('video-progress-bar');
+        const progressText = document.getElementById('video-progress-text');
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLesson(currentLessonIndex);
+            renderModuleList();
+            updateUserStats();
+            loadSavedNotes();
+
+            // Video Time Tracker (Pantau Durasi Nonton)
+            videoElement.addEventListener('timeupdate', trackVideoProgress);
+        });
+
+        // Load Lesson Content
+        function loadLesson(index) {
+            currentLessonIndex = index;
+            const lesson = courseData[index];
+
+            document.getElementById('lesson-title').innerText = lesson.title;
+            document.getElementById('summary-content').innerHTML = lesson.summary;
+            
+            // Switch Video
+            videoSource.src = lesson.videoUrl;
+            videoElement.load();
+
+            // Reset progress display for new video
+            progressBar.style.width = '0%';
+            progressText.innerText = '0%';
+
+            // Update Badge Status
+            updateStatusBadge();
+
+            // Reset Quiz
+            currentQuizIndex = 0;
+            loadQuiz();
+
+            // Re-render Module List Active Highlight
+            renderModuleList();
+        }
+
+        // Monitoring Video Progress
+        function trackVideoProgress() {
+            if (videoElement.duration) {
+                const percent = (videoElement.currentTime / videoElement.duration) * 100;
+                progressBar.style.width = percent.toFixed(0) + '%';
+                progressText.innerText = percent.toFixed(0) + '%';
+
+                // Jika sudah menonton > 80%, tandai modul selesai
+                if (percent >= 80 && !userProgress.completedModules.includes(currentLessonIndex)) {
+                    userProgress.completedModules.push(currentLessonIndex);
+                    userProgress.points += 50; // Bonus XP
+                    saveProgress();
+                    updateUserStats();
+                    updateStatusBadge();
+                    renderModuleList();
+                }
+            }
+        }
+
+        function updateStatusBadge() {
+            const badge = document.getElementById('lesson-status-badge');
+            if (userProgress.completedModules.includes(currentLessonIndex)) {
+                badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 w-fit";
+                badge.innerHTML = `<i class="fa-solid fa-check-circle mr-1"></i> Selesai Ditonton`;
+            } else {
+                badge.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-800 w-fit";
+                badge.innerHTML = `<i class="fa-solid fa-clock mr-1"></i> Sedang Dipelajari`;
+            }
+        }
+
+        // Render List Modul di Sidebar
+        function renderModuleList() {
+            const container = document.getElementById('module-list');
+            container.innerHTML = '';
+
+            courseData.forEach((item, idx) => {
+                const isCompleted = userProgress.completedModules.includes(idx);
+                const isActive = idx === currentLessonIndex;
+
+                const div = document.createElement('div');
+                div.className = `p-3.5 flex items-center justify-between cursor-pointer transition hover:bg-slate-50 ${isActive ? 'bg-indigo-50/80 border-l-4 border-indigo-600' : ''}`;
+                div.onclick = () => loadLesson(idx);
+
+                div.innerHTML = `
+                    <div class="flex items-center space-x-3 overflow-hidden">
+                        <div class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${isCompleted ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-600'}">
+                            ${isCompleted ? '<i class="fa-solid fa-check"></i>' : (idx + 1)}
+                        </div>
+                        <span class="text-xs sm:text-sm font-medium ${isActive ? 'text-indigo-900 font-bold' : 'text-slate-700'} truncate">
+                            ${item.title}
+                        </span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-slate-300 text-xs"></i>
+                `;
+                container.appendChild(div);
+            });
+
+            // Update course progress bar overall
+            const totalModules = courseData.length;
+            const completedCount = userProgress.completedModules.length;
+            const overallPercent = (completedCount / totalModules) * 100;
+            document.getElementById('total-course-progress').style.width = overallPercent + '%';
+            document.getElementById('completed-count-text').innerText = `${completedCount} / ${totalModules}`;
+        }
+
+        // Quiz Logic
+        function loadQuiz() {
+            const quizzes = courseData[currentLessonIndex].quizzes;
+            const feedback = document.getElementById('quiz-feedback');
+            feedback.classList.add('hidden');
+            document.getElementById('quiz-submit-btn').classList.remove('hidden');
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+            selectedOption = null;
+
+            if (!quizzes || quizzes.length === 0) {
+                document.getElementById('quiz-container').innerHTML = `<p class="text-slate-500 text-sm">Belum ada latihan soal untuk bab ini.</p>`;
+                return;
+            }
+
+            const q = quizzes[currentQuizIndex];
+            document.getElementById('quiz-current-num').innerText = currentQuizIndex + 1;
+            document.getElementById('quiz-total-num').innerText = quizzes.length;
+            document.getElementById('quiz-question').innerText = q.question;
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-3 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50/50 text-sm transition flex items-center space-x-3 text-slate-700";
+                btn.onclick = () => selectOption(idx, btn);
+                btn.innerHTML = `
+                    <span class="w-6 h-6 rounded-full border border-slate-300 flex items-center justify-center text-xs font-semibold text-slate-500 bg-white">${String.fromCharCode(65 + idx)}</span>
+                    <span class="flex-1">${opt}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            // Score Display
+            const prevScore = userProgress.quizScores[currentLessonIndex];
+            document.getElementById('quiz-score-display').innerText = prevScore !== undefined ? `Skor Terakhir: ${prevScore} XP` : 'Skor Terakhir: -';
+        }
+
+        function selectOption(index, element) {
+            selectedOption = index;
+            const buttons = document.getElementById('quiz-options').children;
+            for (let btn of buttons) {
+                btn.classList.remove('border-indigo-600', 'bg-indigo-50');
+            }
+            element.classList.add('border-indigo-600', 'bg-indigo-50');
+        }
+
+        function checkQuizAnswer() {
+            if (selectedOption === null) {
+                alert("Pilih salah satu jawaban terlebih dahulu!");
+                return;
+            }
+
+            const quizzes = courseData[currentLessonIndex].quizzes;
+            const q = quizzes[currentQuizIndex];
+            const feedback = document.getElementById('quiz-feedback');
+            
+            feedback.classList.remove('hidden');
+            if (selectedOption === q.correct) {
+                feedback.className = "mt-4 p-3.5 rounded-xl text-sm font-medium bg-emerald-50 text-emerald-800 border border-emerald-200";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> <b>Benar!</b> ${q.explanation}`;
+                userProgress.points += 20; // Tambah XP
+            } else {
+                feedback.className = "mt-4 p-3.5 rounded-xl text-sm font-medium bg-rose-50 text-rose-800 border border-rose-200";
+                feedback.innerHTML = `<i class="fa-solid fa-circle-xmark mr-1 text-rose-600"></i> <b>Kurang Tepat.</b> ${q.explanation}`;
+            }
+
+            userProgress.quizScores[currentLessonIndex] = (userProgress.quizScores[currentLessonIndex] || 0) + (selectedOption === q.correct ? 100 : 0);
+            saveProgress();
+            updateUserStats();
+
+            document.getElementById('quiz-submit-btn').classList.add('hidden');
+            
+            if (currentQuizIndex < quizzes.length - 1) {
+                document.getElementById('quiz-next-btn').classList.remove('hidden');
+            }
+        }
+
+        function nextQuizQuestion() {
+            currentQuizIndex++;
+            loadQuiz();
+        }
+
+        // Tab Switcher
+        function switchTab(tabName) {
+            const summaryTab = document.getElementById('tab-summary');
+            const quizTab = document.getElementById('tab-quiz');
+            const summaryBtn = document.getElementById('tab-btn-summary');
+            const quizBtn = document.getElementById('tab-btn-quiz');
+
+            if (tabName === 'summary') {
+                summaryTab.classList.remove('hidden');
+                quizTab.classList.add('hidden');
+                summaryBtn.className = "flex-1 py-3 px-4 font-semibold text-sm text-indigo-600 border-b-2 border-indigo-600 flex items-center justify-center space-x-2";
+                quizBtn.className = "flex-1 py-3 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 border-b-2 border-transparent flex items-center justify-center space-x-2";
+            } else {
+                summaryTab.classList.add('hidden');
+                quizTab.classList.remove('hidden');
+                quizBtn.className = "flex-1 py-3 px-4 font-semibold text-sm text-indigo-600 border-b-2 border-indigo-600 flex items-center justify-center space-x-2";
+                summaryBtn.className = "flex-1 py-3 px-4 font-semibold text-sm text-slate-500 hover:text-indigo-600 border-b-2 border-transparent flex items-center justify-center space-x-2";
+            }
+        }
+
+        // Save Notes to LocalStorage
+        function saveNotes() {
+            const noteText = document.getElementById('personal-notes').value;
+            localStorage.setItem(`edu_note_${currentLessonIndex}`, noteText);
+            alert("Catatan berhasil disimpan!");
+        }
+
+        function loadSavedNotes() {
+            const saved = localStorage.getItem(`edu_note_${currentLessonIndex}`);
+            document.getElementById('personal-notes').value = saved || '';
+        }
+
+        // Helpers
+        function updateUserStats() {
+            document.getElementById('user-points').innerText = `${userProgress.points} XP`;
+        }
+
+        function saveProgress() {
+            localStorage.setItem('edu_progress', JSON.stringify(userProgress));
+        }
+    </script>
+</body>
+</html>
